@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>Fursten 3</title>
+		<script src="fursten.js" type="module"></script>
+	</head>
+	<body>
+		<div style="position:relative;">
+			<h1>Fursten 3</h1>
+			<canvas id="canvas"></canvas>
+			<div style="position:absolute;top:30px;right:30px">
+				<form name="filters">
+					<label>
+						<input type="checkbox" name="production" checked>Production
+					</label><br>
+					<label>
+						<input type="checkbox" name="consumtion" checked>Consumtion
+					</label><br>
+					<label>
+						<input type="checkbox" name="supply">Supply
+					</label><br>
+					<label>
+						<input type="checkbox" name="demand">Demand
+					</label><br>
+				</form>
+				<button id="generateBtn">Generate</button></br>
+
+				<input type="text" id="numTicks" value="100">
+				<button id="runBtn">Run</button>
+			</div>
+		</div>
+	</body>
+</html>
