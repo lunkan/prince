@@ -1,8 +1,13 @@
+import { config } from './config.js';
+import { WorldBuilder } from './world-builder.js';
+import { WorldCanvas } from './world-canvas.js';
 
+let world;
+let worldMapRef;
+let worldCanvas;
 
-import { Area } from './area.js';
-
-console.log('area', Area);
+// OLD CODE
+//--------------------
 
 let tick = 0;
 const runDemandStack = [];
@@ -202,6 +207,12 @@ class Node {
 }
 
 const generateWorld = (size) => {
+
+	world = new WorldBuilder(config, size, size)
+		.mountains()
+		.workers()
+		.create();
+
 	nodes.length = 0;
 	for (let iy = 0; iy < size; iy++){
 		nodes.push([]);
@@ -276,6 +287,24 @@ const run = (numTicks) => {
 
 const SCALE = 50;
 const draw = () => {
+
+	worldCanvas = new WorldCanvas(worldMapRef.getContext('2d'), SCALE);
+	worldMap.width = SCALE * world.sizeX;
+	worldMap.height = SCALE * world.sizeY;
+
+	world.getSectorList()
+		.map(sector => worldCanvas.getContext(sector))
+		.forEach(sectorContext => sectorContext
+			.drawBorders()
+			.drawTerrain()
+			//.drawTransportNetwork()
+			//.drawEntityHeatMap(entity, type)
+			.drawWorkers('wool')
+		);
+
+	// OLD DRAW
+	//--------------------------
+
 	if (!nodes) {
 		return;
 	}
@@ -283,8 +312,8 @@ const draw = () => {
 	const canvas = document.getElementById('canvas');
 	canvas.width = SCALE * nodes[0].length;
 	canvas.height = SCALE * nodes.length;
-
 	var ctx = canvas.getContext('2d');
+
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = 'grey';
 
@@ -371,6 +400,9 @@ const draw = () => {
 
 
 window.onload = () => {
+
+	worldMapRef = document.getElementById('worldMap');
+
 	[...document.filters.elements].forEach(input => {
 		input.addEventListener('change', draw);
 	});
