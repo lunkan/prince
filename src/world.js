@@ -4,6 +4,7 @@ import { Link } from './link.js';
 export class World {
 	constructor(config, sizeX, sizeY) {
 		this.links = new Map();
+		this.config = config;
 		this.tick = 0;
 
 		// Create sectors
@@ -11,17 +12,19 @@ export class World {
 		for (let iy = 0; iy < sizeY; iy++){
 			this.grid.push([]);
 			for (let ix = 0; ix < sizeX; ix++){
-				this.grid[iy][ix] = new Sector(config, ix, iy);
+				this.grid[iy][ix] = new Sector(this.config, ix, iy);
 			}
 		}
+	}
 
+	connect() {
 		// Connect links
 		this.getSectorList().forEach(sector => {
 			const vectors = this.getNeighborSectors(sector).map(neighbor => {
 				const linkKey = Link.generateKey(sector, neighbor);
 
 				if (!this.links.has(linkKey)) {
-					const newLink = new Link(config, sector, neighbor);
+					const newLink = new Link(this.config, sector, neighbor);
 					this.links.set(linkKey, newLink);
 				}
 

@@ -298,8 +298,8 @@ const draw = () => {
 			.drawBorders()
 			.drawTerrain()
 			//.drawTransportNetwork()
-			//.drawEntityHeatMap(entity, type)
-			.drawWorkers('wool')
+			.drawEntityHeatMap('wool', document.filters.demand.checked, document.filters.supply.checked)
+			.drawWorkers(['wool'])
 		);
 
 	// OLD DRAW
@@ -414,6 +414,9 @@ window.onload = () => {
 
 	document.getElementById('runBtn').addEventListener('click', () => {
 		const numTicks = parseInt(document.getElementById('numTicks').value) || 0;
+
+		world.run(numTicks);
+
 		run(numTicks);
 		draw();
 	});

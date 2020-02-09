@@ -13,8 +13,8 @@ export class Sector {
 			entity.name,
 			{
 				demandIncrementor: 0,
-				demand: 1,
-				supplyIncrementor: 0,
+				demand: 0,
+				supplyDecrementor: 0,
 				supply: 0,
 			},
 		]));
@@ -35,14 +35,14 @@ export class Sector {
 	getSupply(entityName, demand) {
 		const entity = this.entities.get(entityName);
 		entity.demandIncrementor += demand;
-		return entity.supply * (demand / entity.demand);
+		const supply = entity.supply * (entity.demand ? demand / entity.demand : 0);
+		// entity.supplyDecrementor += supply;
+		return supply;
 	}
 
 	execute() {
-		this.entities.keys().forEach(entityName => {
-			const entity = this.entities.get(entityName);
+		this.entities.forEach((entity, entityName) => {
 			const worker = this.workers.get(entityName);
-
 			const vectorWinner = this.vectors.sort((vectorA, vectorB) => {
 				return vectorA.getValue(entityName) - vectorB.getValue(entityName);
 			})[0];
@@ -53,14 +53,45 @@ export class Sector {
 				} else if (vector.isNeighborVector(vectorWinner)) {
 					return vector.execute(entityName, -0.1 * entity.demand);	
 				} else {
-					return vector.execute(0);	
+					return vector.execute(entityName, 0);	
 				}
 				
 			}).reduce((acc, supply) => acc + supply, 0);
 
-			entity.supply = Math.max(0, vectorSupplySum + worker.production - worker.consumtion);
-			entity.demand = entity.demandIncrementor;
+			
+
+			/*const ratio = entity.supplyDecrementor ? entity.supply / entity.supplyDecrementor : 1;
+
+			const supplyIn = worker.production + vectorSupplySum;
+			const supplyOut = worker.consumtion; // entity.supplyDecrementor
+
+			entity.supply = Math.max(0, worker.production + vectorSupplySum - worker.consumtion) * (Math.min(1, ratio) * 0.5 + 0.5);
+			entity.supplyDecrementor = 0;*/
+
+			entity.supply = worker.production + vectorSupplySum;
+
+			//entity.supply = vectorSupplySum;
+
+			
+
+			// entity.supply = worker.production ? Math.max(worker.production, vectorSupplySum): vectorSupplySum; // Math.max(0, worker.production + vectorSupplySum - worker.consumtion);
+			// entity.supply = Math.min(entity.supply, worker.consumtion + entity.demandIncrementor);
+
+
+			entity.demand = worker.consumtion + entity.demandIncrementor;
 			entity.demandIncrementor = 0;
+
+			if (worker.production) {
+				console.log('prod:', worker.production, entity.supply, entity.demand, entity.demand / entity.supply);
+			}
+			
+			if (worker.consumtion) {
+				console.log('cons:', worker.consumtion, entity.supply, entity.demand, entity.demand / entity.supply);
+			}
+
+			/*if (worker.production && entity.demand / entity.supply > 0.1) {
+				entity.supply += worker.production;
+			}*/
 		});
 	}
 }

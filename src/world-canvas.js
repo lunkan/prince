@@ -73,24 +73,26 @@ export class SectorContext {
 		return this;
 	}
 
-	drawWorkers(entityName, type) {
-		const worker = this.sector.workers.get(entityName);
+	drawWorkers(entityNames, type) {
+		entityNames.forEach(entityName => {
+			const worker = this.sector.workers.get(entityName);
 
-		if ((!type || type === 'production') && worker.production) {
-			const radius = this.width * 0.5 * (worker.production / 2);
-			this.ctx.fillStyle = '#0000ff';
-			this.ctx.beginPath();
-			this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
-			this.ctx.fill();
-		}
+			if ((!type || type === 'production') && worker.production) {
+				const radius = this.width * 0.5 * (worker.production / 2);
+				this.ctx.fillStyle = '#0000ff';
+				this.ctx.beginPath();
+				this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
+				this.ctx.fill();
+			}
 
-		if ((!type || type === type === 'consumtion') && worker.consumtion) {
-			const radius = this.width * 0.5 * (worker.consumtion / 2);
-			this.ctx.fillStyle = '#ff0000';
-			this.ctx.beginPath();
-			this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
-			this.ctx.fill();
-		}
+			if ((!type || type === type === 'consumtion') && worker.consumtion) {
+				const radius = this.width * 0.5 * (worker.consumtion / 2);
+				this.ctx.fillStyle = '#ff0000';
+				this.ctx.beginPath();
+				this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
+				this.ctx.fill();
+			}
+		});
 
 		return this;
 	}
@@ -99,7 +101,20 @@ export class SectorContext {
 		return this;
 	}
 
-	drawEntityHeatMap(entityName, type) {
+	drawEntityHeatMap(entityName, demand, supply) {
+		const entity = this.sector.entities.get(entityName);
+
+		//console.log('drawEntityHeatMap', entity);
+		if (demand && entity.demand) {
+			this.ctx.fillStyle = `rgba(255, 0, 0, ${Math.min(1, entity.demand)})`;
+			this.ctx.fillRect(this.x, this.y, this.width, this.height);
+    	}
+
+		if (supply && entity.supply) {
+			this.ctx.fillStyle = `rgba(0, 0, 255, ${Math.min(1, entity.supply)})`;
+			this.ctx.fillRect(this.x, this.y, this.width, this.height);
+    	}
+
 		return this;
 	}
 }

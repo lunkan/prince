@@ -34,6 +34,7 @@ export class WorldBuilder {
 	}
 
 	create() {
+		this.world.connect();
 		return this.world;
 	}
 }
