@@ -73,21 +73,12 @@ export class SectorContext {
 		return this;
 	}
 
-	drawWorkers(entityNames, type) {
-		entityNames.forEach(entityName => {
-			const worker = this.sector.workers.get(entityName);
-
-			if ((!type || type === 'production') && worker.production) {
-				const radius = this.width * 0.5 * (worker.production / 2);
-				this.ctx.fillStyle = '#0000ff';
-				this.ctx.beginPath();
-				this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
-				this.ctx.fill();
-			}
-
-			if ((!type || type === type === 'consumtion') && worker.consumtion) {
-				const radius = this.width * 0.5 * (worker.consumtion / 2);
-				this.ctx.fillStyle = '#ff0000';
+	drawWorkers(workerNames) {
+		workerNames.forEach(workerName => {
+			const worker = this.sector.workers.get(workerName);
+			if (worker.amount) {
+				const radius = this.width * 0.5 * (worker.amount / 2);
+				this.ctx.fillStyle = worker.config.color;
 				this.ctx.beginPath();
 				this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
 				this.ctx.fill();
@@ -98,6 +89,26 @@ export class SectorContext {
 	}
 
 	drawTransportNetwork() {
+		this.sector.vectors.forEach(vector => {
+
+			const target = vector.target;
+			if (target !== this.sector) {
+				const thickness = Math.min(vector.getCurrent() * 5, 5);
+				
+				if (thickness > 0.5) {
+					const toX = target.x > this.sector.x ? this.right : target.x < this.sector.x ? this.left : this.center;
+					const toY = target.y > this.sector.y ? this.bottom : target.y < this.sector.y ? this.top : this.middle;
+				
+					this.ctx.lineWidth = thickness;
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.center, this.middle);
+					this.ctx.lineTo(toX, toY);
+					this.ctx.stroke();
+				}
+			}
+		});
+
+
 		return this;
 	}
 

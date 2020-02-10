@@ -28,8 +28,8 @@ export class WorldBuilder {
 	}
 
 	workers() {
-		this.world.randSector().workers.get('wool').production = 1;
-		this.world.randSector().workers.get('wool').consumtion = 1;
+		this.world.randSector().workers.get('shepherd').amount = 1;
+		this.world.randSector().workers.get('tailor').amount = 1;
 		return this;
 	}
 

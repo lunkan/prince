@@ -85,6 +85,9 @@ export class World {
 	run(numTicks) {
 		for (let i = 0; i < numTicks; i++) {
 			this.getSectorList().forEach(sector => sector.execute());
+
+			this.links.forEach(link => link.updateTrackBonus());
+
 			this.tick++;
 		}
 	}

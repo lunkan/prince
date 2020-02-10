@@ -297,9 +297,9 @@ const draw = () => {
 		.forEach(sectorContext => sectorContext
 			.drawBorders()
 			.drawTerrain()
-			//.drawTransportNetwork()
+			.drawTransportNetwork()
 			.drawEntityHeatMap('wool', document.filters.demand.checked, document.filters.supply.checked)
-			.drawWorkers(['wool'])
+			.drawWorkers(['shepherd', 'tailor'])
 		);
 
 	// OLD DRAW

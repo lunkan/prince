@@ -1,7 +1,11 @@
+
+const keys = {};
+
 export class Link {
 	static generateKey(sectorA, sectorB) {
-		const keySortedSectors = [sectorA, sectorB].sort((a, b) => a.id - b.id);
-		return keySortedSectors.map(sector => sector.id).join('_');
+		const keySortedSectors = [sectorA, sectorB].sort((a, b) => a.id.localeCompare(b.id));
+		const keyString = keySortedSectors.map(sector => sector.id).join('_');
+		return keyString;
 	}
 
 	static isNeighborVectors(vectorA, vectorB) {
@@ -20,10 +24,15 @@ export class Link {
 		this.terrain = config.terrainResistance.default + (sectorA.terrain.mountains * config.terrainResistance.mountain)/2 + (sectorB.terrain.mountains * config.terrainResistance.mountain)/2;
 		this.distance = Math.sqrt(Math.pow(sectorA.x - sectorB.x, 2) + Math.pow(sectorA.y - sectorB.y, 2));
 
-		this.vectors = [sectorA, sectorB].map((sector, i, list) => {
+		this.trackIncrementor = 0;
+		this.trackBonus = 0;
+
+		this.sectors = [sectorA, sectorB];
+		this.vectors = this.sectors.map((sector, i) => {
 			return {
+				link: this,
 				source: sector,
-				target: i === 0 ? list[1] : list[0], 
+				target: i === 0 ? this.sectors[1] : this.sectors[0], 
 				entities: new Map(config.entities.map(entity => [
 					entity.name,
 					{
@@ -35,9 +44,16 @@ export class Link {
 		});
 	}
 
+	updateTrackBonus() {
+		this.trackBonus = this.trackBonus * 0.98 + this.trackIncrementor * 0.02;
+		this.trackIncrementor = 0;
+	}
+
 	getVectorFromSource(source) {
 		const vector = this.vectors.find(vector => vector.source === source);
 		return {
+			target: vector.target,
+			getCurrent: this.getCurrent.bind(this),
 			execute: this.execute.bind(this, vector),
 			getValue: this.getValue.bind(this, vector),
 			isNeighborVector: function (neighbor) {
@@ -46,15 +62,19 @@ export class Link {
 		};
 	}
 
+	getCurrent() {
+		return this.trackBonus;
+	}
+
 	execute(vector, entityName, value) {
 		const entity = vector.entities.get(entityName); 
 		entity.demand = entity.demand * 0.9 + value * 0.1;
 
-		// Base 1.25 - to counter current bonus for demand (1.2)
-		const resistance = 1.25 + (this.terrain / (1 + entity.supply * 2)) * this.distance;
-
+		const resistance = 1 + (this.terrain / (1 + entity.supply * 2)) * this.distance;
 		const modDemand = entity.demand / resistance;
 		entity.supply = vector.target.getSupply(entityName, modDemand);
+
+		this.trackIncrementor += entity.supply;
 
 		return entity.supply;
 	}
