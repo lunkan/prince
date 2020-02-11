@@ -93,7 +93,7 @@ export class SectorContext {
 
 			const target = vector.target;
 			if (target !== this.sector) {
-				const thickness = Math.min(vector.getCurrent() * 5, 5);
+				const thickness = Math.min(vector.getCurrent() * 5, 500);
 				
 				if (thickness > 0.5) {
 					const toX = target.x > this.sector.x ? this.right : target.x < this.sector.x ? this.left : this.center;
@@ -113,18 +113,26 @@ export class SectorContext {
 	}
 
 	drawEntityHeatMap(entityName, demand, supply) {
-		const entity = this.sector.entities.get(entityName);
+		if (entityName) {
+			const entity = this.sector.entities.get(entityName);
 
-		//console.log('drawEntityHeatMap', entity);
-		if (demand && entity.demand) {
-			this.ctx.fillStyle = `rgba(255, 0, 0, ${Math.min(1, entity.demand)})`;
-			this.ctx.fillRect(this.x, this.y, this.width, this.height);
-    	}
+			const level = entity.supply + entity.demand;
+			
 
-		if (supply && entity.supply) {
-			this.ctx.fillStyle = `rgba(0, 0, 255, ${Math.min(1, entity.supply)})`;
-			this.ctx.fillRect(this.x, this.y, this.width, this.height);
-    	}
+			if (level > 0.1) {
+				const diff = entity.supply - entity.demand;
+				// Js not handeling negative sqrt
+				const heatValue = diff > 0 ? Math.pow(diff, 0.5) : -1 * Math.pow(Math.abs(diff), 0.5);
+				const normalizedValue = Math.max(Math.min(heatValue, 1), -1) / 1;
+
+				const red = normalizedValue < 0 ? Math.abs(normalizedValue) * 255 : 0;
+				const green = (1 - Math.abs(normalizedValue)) * 255;
+				const blue = normalizedValue > 0 ? normalizedValue * 255 : 0;
+
+				this.ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${1})`;
+				this.ctx.fillRect(this.x, this.y, this.width, this.height);
+			}
+	    }
 
 		return this;
 	}

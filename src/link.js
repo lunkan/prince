@@ -56,6 +56,7 @@ export class Link {
 			getCurrent: this.getCurrent.bind(this),
 			execute: this.execute.bind(this, vector),
 			getValue: this.getValue.bind(this, vector),
+			toString: this.toString.bind(this, vector),
 			isNeighborVector: function (neighbor) {
 				return Link.isNeighborVectors(vector, neighbor);
 			},
@@ -70,7 +71,7 @@ export class Link {
 		const entity = vector.entities.get(entityName); 
 		entity.demand = entity.demand * 0.9 + value * 0.1;
 
-		const resistance = 1 + (this.terrain / (1 + entity.supply * 2)) * this.distance;
+		const resistance = 1 + (this.terrain / (1 + this.trackBonus * 2)) * this.distance; // entity.supply
 		const modDemand = entity.demand / resistance;
 		entity.supply = vector.target.getSupply(entityName, modDemand);
 
@@ -82,5 +83,19 @@ export class Link {
 	getValue(vector, entityName) {
 		const entity = vector.entities.get(entityName);
 		return entity.supply ? entity.demand / entity.supply : -Math.random();
+	}
+
+	toString(vector) {
+		const output = [];
+
+		output.push('VECTOR');
+		output.push(`TrackBonus: ${this.trackBonus}`);
+		vector.entities.forEach((entity, entityName) => {
+			const supplyStr = entity.supply > 0.0001 ? entity.supply.toString().substring(0, 5) : '~0';
+			const demandStr = entity.demand > 0.0001 ? entity.demand.toString().substring(0, 5) : '~0';
+			output.push(`${entityName}: ${supplyStr} | ${demandStr}`);
+		});
+
+		return output.join('\n');
 	}
 }

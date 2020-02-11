@@ -4,6 +4,7 @@ export class Sector {
 
 	constructor(config, x, y) {
 		this.id = `sec@[${x}:${y}]`;
+		this.config = config;
 		this.x = x;
 		this.y = y;
 
@@ -31,7 +32,7 @@ export class Sector {
 	getSupply(entityName, demand) {
 		const entity = this.entities.get(entityName);
 		entity.demandIncrementor += demand;
-		const supply = entity.supply * (entity.demand ? demand / entity.demand : 0);
+		const supply = entity.supply * Math.min(1, (entity.demand ? demand / entity.demand : 0));
 		return supply;
 	}
 
@@ -47,16 +48,29 @@ export class Sector {
 				if (vector === vectorWinner) {
 					return vector.execute(entityName, entity.demand);
 				} else if (vector.isNeighborVector(vectorWinner)) {
-					return vector.execute(entityName, -0.2 * entity.demand);
+					return vector.execute(entityName, this.config.general.demandDirectionSharpness * entity.demand);
 				} else {
 					return vector.execute(entityName, 0);	
 				}
 				
 			}).reduce((acc, supply) => acc + supply, 0);
 
-			entity.supply = vectorSupplySum;
+			entity.supply = vectorSupplySum * this.config.general.supplyDecline;
 			entity.demand = entity.demandIncrementor;
 			entity.demandIncrementor = 0;
 		});
+	}
+
+	toString() {
+		const output = [];
+
+		output.push('ENTITIES');
+		this.entities.forEach((entity, entityName) => {
+			const supplyStr = entity.supply > 0.0001 ? entity.supply.toString().substring(0, 5) : '~0';
+			const demandStr = entity.demand > 0.0001 ? entity.demand.toString().substring(0, 5) : '~0';
+			output.push(`${entityName}: ${supplyStr} | ${demandStr}`);
+		});
+
+		return output.join('\n');
 	}
 }

@@ -37,7 +37,7 @@ export class Workers {
 				}
 			});
 		});
-
+		
 		return valueSum;
 	}
 
@@ -61,5 +61,16 @@ export class Workers {
 
 	isNeighborVector(vector) {
 		return false;
+	}
+
+	toString() {
+		const output = [];
+
+		output.push('WORKERS');
+		this.workers.forEach((worker, workerName) => {
+			output.push(`${workerName}: ${worker.amount}`);
+		});
+
+		return output.join('\n');
 	}
 }
