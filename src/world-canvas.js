@@ -42,12 +42,11 @@ export class SectorContext {
 
 	drawTerrain() {
 
-		// if (this.sector.terrain.forrest) {
-		// 	this.ctx.fillStyle = '#014E00';
-		//
-		// } else {
+		/*if (this.sector.terrain.plains) {
+			this.ctx.fillStyle = '#ff9900';
+		} else {*/
 			this.ctx.fillStyle = '#BDD4AB';
-		// }
+		//}
 
 		// Default
 		this.ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -77,11 +76,37 @@ export class SectorContext {
 			this.ctx.fill();
 		}
 
-		// Mountains
+		// Plains
+		this.ctx.lineWidth = 1;
+		this.ctx.strokeStyle = '#ff9900';
+		const plains = this.sector.terrain.plains;
+		if (plains > 0) {
+			
+			for (let ix = 0; ix < this.width; ix += 4) {
+				const x = this.left + ix;
+				const y = this.top + ix;
+				this.ctx.beginPath();
+				this.ctx.moveTo(this.left, y);
+				this.ctx.lineTo(x, this.top);
+				this.ctx.stroke();
+			}
+
+			for (let ix = 2; ix < this.width; ix += 4) {
+				const x = this.left + ix;
+				const y = this.top + ix;
+				this.ctx.beginPath();
+				this.ctx.moveTo(this.right, y);
+				this.ctx.lineTo(x, this.bottom);
+				this.ctx.stroke();
+			}
+		}
+
+		// Forrest
 		const forrest = this.sector.terrain.forrest;
 		if (forrest > 0) {
 			const seed = this.sector.y * 100 + this.x;
-			const trees = Array(20).fill(null).map((value, i) => {
+			const numTrees = Math.ceil(Math.min(20, forrest * 20));
+			const trees = Array(numTrees).fill(null).map((value, i) => {
 				const seedX = ((seed + i) % 10) / 10;
 				const seedY = ((seed + i) % 3) / 3;
 				const seedZ = (i % 3) / 3;
@@ -127,6 +152,7 @@ export class SectorContext {
 	}
 
 	drawTransportNetwork() {
+		this.ctx.strokeStyle = `rgba(102, 51, 0, 0.65)`;	
 		this.sector.vectors.forEach(vector => {
 
 			const target = vector.target;

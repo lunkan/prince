@@ -5,6 +5,7 @@ export const config = {
 	},
 	terrainResistance: {
 		default: 3,
+		plain: 3,
 		mountain: 20,
 		forrest: 5,
 	},
