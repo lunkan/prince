@@ -41,8 +41,15 @@ export class SectorContext {
 	}
 
 	drawTerrain() {
+
+		// if (this.sector.terrain.forrest) {
+		// 	this.ctx.fillStyle = '#014E00';
+		//
+		// } else {
+			this.ctx.fillStyle = '#BDD4AB';
+		// }
+
 		// Default
-		this.ctx.fillStyle = '#BDD4AB';
 		this.ctx.fillRect(this.x, this.y, this.width, this.height);
 
 		// Mountains
@@ -68,6 +75,37 @@ export class SectorContext {
 			this.ctx.lineTo(this.left, this.bottom);
 			this.ctx.lineTo(this.left, this.top);
 			this.ctx.fill();
+		}
+
+		// Mountains
+		const forrest = this.sector.terrain.forrest;
+		if (forrest > 0) {
+			const seed = this.sector.y * 100 + this.x;
+			const trees = Array(20).fill(null).map((value, i) => {
+				const seedX = ((seed + i) % 10) / 10;
+				const seedY = ((seed + i) % 3) / 3;
+				const seedZ = (i % 3) / 3;
+
+				return [
+					this.x + seedX * this.width + Math.sin(seed + i) * 10,
+					this.y + seedY * this.height + Math.cos(seed + i) * 10,
+					3 + Math.round(seedZ * 3),
+				];
+			});
+
+			this.ctx.fillStyle = `rgba(0, 0, 0, 0.25)`;	
+			trees.forEach(point => {
+				this.ctx.beginPath();
+				this.ctx.ellipse(point[0] + 2, point[1] + 4, point[2] * 1.2, point[2], Math.PI / 3, 0, 2 * Math.PI, false);
+				this.ctx.fill();
+			});
+
+			trees.forEach((point, i) => {
+				this.ctx.fillStyle = i % 2 === 0 ? '#014e00' : '#218922';
+				this.ctx.beginPath();
+				this.ctx.arc(point[0], point[1], point[2], 0, 2 * Math.PI, false);
+				this.ctx.fill();
+			});
 		}
 
 		return this;

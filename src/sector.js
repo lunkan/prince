@@ -10,6 +10,7 @@ export class Sector {
 
 		this.terrain = {
 			mountains: 0,
+			forrest: 0,
 		};
 
 		this.entities = new Map(config.entities.map(entity => [

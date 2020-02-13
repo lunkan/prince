@@ -10,6 +10,7 @@ const generateWorld = (size) => {
 	world = new WorldBuilder(config, size, size)
 		.mountains()
 		.workers()
+		.forrest()
 		.create();
 };
 

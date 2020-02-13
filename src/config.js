@@ -6,6 +6,7 @@ export const config = {
 	terrainResistance: {
 		default: 3,
 		mountain: 20,
+		forrest: 5,
 	},
 	entities: [{
 		name: 'wool',
