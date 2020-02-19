@@ -23,6 +23,7 @@ const draw = () => {
 	worldMap.height = SCALE * world.sizeY;
 
 	const selectedHeatmap = document.filters.elements['heatmap'].value;
+	const workers = config.workers.map(worker => worker.name);
 
 	world.getSectorList()
 		.map(sector => worldCanvas.getContext(sector))
@@ -31,7 +32,7 @@ const draw = () => {
 			.drawTerrain()
 			.drawTransportNetwork()
 			.drawEntityHeatMap(selectedHeatmap, document.filters.demand.checked, document.filters.supply.checked)
-			.drawWorkers(['shepherd', 'tailor', 'hunter', 'farmer'])
+			.drawWorkers(workers)
 		);
 };
 

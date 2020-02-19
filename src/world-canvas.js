@@ -41,14 +41,7 @@ export class SectorContext {
 	}
 
 	drawTerrain() {
-
-		/*if (this.sector.terrain.plains) {
-			this.ctx.fillStyle = '#ff9900';
-		} else {*/
-			this.ctx.fillStyle = '#BDD4AB';
-		//}
-
-		// Default
+		this.ctx.fillStyle = '#BDD4AB';
 		this.ctx.fillRect(this.x, this.y, this.width, this.height);
 
 		// Mountains
@@ -140,7 +133,7 @@ export class SectorContext {
 		workerNames.forEach(workerName => {
 			const worker = this.sector.workers.get(workerName);
 			if (worker.amount) {
-				const radius = this.width * 0.5 * (worker.amount / 2);
+				const radius = Math.sqrt(this.width * 0.5 * worker.amount);
 				this.ctx.fillStyle = worker.config.color;
 				this.ctx.beginPath();
 				this.ctx.arc(this.center, this.middle, radius, 0, 2 * Math.PI);
@@ -157,7 +150,7 @@ export class SectorContext {
 
 			const target = vector.target;
 			if (target !== this.sector) {
-				const thickness = Math.min(vector.getCurrent() * 5, 500);
+				const thickness = Math.min(10, vector.getCurrent() * 5);
 				
 				if (thickness > 0.5) {
 					const toX = target.x > this.sector.x ? this.right : target.x < this.sector.x ? this.left : this.center;

@@ -9,6 +9,7 @@ export class Sector {
 		this.y = y;
 
 		this.terrain = {
+			grassland: 0.2,
 			mountains: 0,
 			forrest: 0,
 			plains: 0,
